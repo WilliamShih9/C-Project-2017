@@ -88,6 +88,7 @@ int main (int argc, char* argv[])
         cout << "xaxis or yaxis is set to a invalid low number (below 5): x=" << xaxis << " and y= " << yaxis << endl;
         return 0;
     }
+    clock_t start=clock();
     int frames=to_int(check("frames",list))+1;
     int framesper=to_int(check("framespersecond",list));
     int clouds=to_int(check("numberofclouds",list));
@@ -114,8 +115,7 @@ int main (int argc, char* argv[])
     double factorincrement=1.00*factorrange/frames;
     double darknessfactor=1.0*check("skydarknessfactor",list);
     for (int i=1; i<frames; i++) {
-        g[i].full_color(255,255,255);
-        if (i==-1){
+        if (i==1){
             int mincircles=to_int(check("mincirclespercloud",list));
             int maxcircles=to_int(check("maxcirclespercloud",list));
             int range=maxcircles-mincircles;
@@ -131,40 +131,62 @@ int main (int argc, char* argv[])
             for (int k=1; k<=clouds; k++){
                 cloudinterval(rand()%range+mincircles,k,2,frames/3,cloudspawn(list),cloudfinal(list),1,1,2.00*sqrt(two[0]*two[1]),list,g);
                  cloudinterval(rand()%range+mincircles,k,frames/3,2*frames/3,cloudspawn(list),cloudfinal(list),two[0],two[1],cloudfactor,list,g);
-                 cloudinterval(rand()%range+mincircles,k,2*frames/3,frames-1,Point(-xaxis/2,yaxis/4),cloudfinal(list),5*two[0],two[1],1,list,g);
+                 cloudinterval(rand()%range+mincircles,k,2*frames/3,frames-1,cloudspawn(list),cloudfinal(list),4*two[0],two[1],1,list,g);
             }
+            clock_t endtime=clock();
+            double time=(endtime-start)/(double)CLOCKS_PER_SEC;
+            cout << "Clouds are set up. Took " << time << " seconds. " << endl;
+            clock_t start1=clock();
             for (int p=1; p<frames; p++){
                 g[p].set_sky(skycolor(list),clouds,darknessfactor);
             }
+            clock_t endtime1=clock();
+            double time1=(endtime1-start1)/(double)CLOCKS_PER_SEC;
+            cout << "Sky is set up. Took " << time1 << " seconds. " << endl;
+            start1=clock();
             for (int s=1; s<frames; s++){
                 g[s].draw_sun(suns[s-1],to_int(check("sunradius",list)),suncolor(list));
             }
+            endtime1=clock();
+            time1=(endtime1-start1)/(double)CLOCKS_PER_SEC;
+            cout << "Sun is set up. Took " << time1 << " seconds. " << endl;
         }
-        int minrainpct=to_int(check("minrainpercentage",list));
-        int maxrainpct=to_int(check("maxrainpercetnage",list));
-        int range=maxrainpct-minrainpct;
-        if (i==-1) {
+        if (i==1) {
+            clock_t start=clock();
+            int minrainpct=to_int(check("minrainpercentage",list));
+            int maxrainpct=to_int(check("maxrainpercetnage",list));
+            int range=maxrainpct-minrainpct;
             for (int k=1; k<frames; k++){
                 for (int j=1; j<=clouds; j++){
                     g[k].set_rain(j,rand()%range+minrainpct,to_int(check("sizethreshold",list)),to_int(check("rainspeed",list)),raincolor(list),to_int(check("rainthreshold",list)));
                 }
             }
+            clock_t end=clock();
+            double time=(end-start)/(double)CLOCKS_PER_SEC;
+            cout << "Rain is set up. Took " << time << " seconds." << endl;
+            start=clock();
             drawrain(0,frames,g,xaxis,yaxis,windrate);
-            cout << "Rain done!" << endl;
+            end=clock();
+            time=(end-start)/(double)CLOCKS_PER_SEC;
+            cout << "Rain is drawn. Took " << time << " seconds." << endl;
         }
-        /* for (int j=1; j<=clouds; j++){
+        for (int j=1; j<=clouds; j++){
             g[i].draw_cloud(j);
-        }*/
+        }
         g[i].draw_wave(initialwave+i*wincrement,to_int(check("wavewidth",list)),factor*i/framesper,Point(i,(yaxis)*(1.00-(check("wavetoyaxisratio",list)))),oceancolor(list));
         g[i].draw_boat(Point(iboat+i*boatincrement,(yaxis)*(1.00-(check("wavetoyaxisratio",list)))),to_int(check("shipheight",list)),to_int(check("shipwidth",list)),to_int(check("shipwidthmast",list)),to_int(check("shipdepth",list)),i*4*pow(factor,2)*180/3.1415*(2.00*3.1415/320),shipcolor(list),mastcolor(list));
-        g[i].draw_Tornado(3.00*i/frames,3.00*i/frames,10.00,3.00, Point(500,500),Color(0,0,0));
         cout << "Frame " << i << " calculated..." << endl;
         factor+=factorincrement;
     }
-    cout << "Frames successfully completed. " << endl;
+    clock_t fin=clock();
+    double time3=(fin-start)/(double)CLOCKS_PER_SEC;
+    cout << "Frames successfully completed. Took " << time3 << " seconds." << endl;
     for (int i=1; i<frames; i++){
         write_bmp_file(i, "weatherproject.bmp", g[i], xaxis, yaxis);
     }
+    clock_t complete=clock();
+    double time4=(complete-start)/(double)CLOCKS_PER_SEC;
+    cout << "Time to run the program took " << time4 << " seconds." << endl;
     string resolution=int_to_res(xaxis,yaxis);
     cout << "Copy and paste the three lines below to create animation. Must have ffmpeg and mogrify avaiable: " << endl;
     cout << "cd BMPFolder" << endl;
@@ -175,8 +197,6 @@ int main (int argc, char* argv[])
     delete[] g;
     g=NULL;
 }
-
-
 //-----------------------------------------------
 
 double check(string variable, vector<Configuration> list)
@@ -310,7 +330,7 @@ void write_bmp_file(int f_number, string output_file_name, Graphics g, int px, i
     cout<<"Failbit flag is set. ";
     }
    if(ostrm_1.fail()){
-      cout << "Error.  Can't open output file " << o_file_name << "." << endl;
+      cout << "Error.  Can't open output file " << o_file_name << ". Did you make sure there is a BMPFolder?" << endl;     
       return;
    }
    cout << "Opening output file " << o_file_name <<"." << endl;

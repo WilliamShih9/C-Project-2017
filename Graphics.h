@@ -80,8 +80,6 @@ class Graphics
     	void draw_sun(Point middle, double radius, Color suncol);
 	// Draw a wave with a height, width, period, yaxis, and color. All points below the wave are also colored the color of the current wave
         void draw_wave(double height, double width, double period, Point middle, Color wave);
-    //  Draw a tornado with a cetain height, width, amplitude, centered at a point and with a certain color
-        void draw_Tornado(double height, double width, double amplitude, double period, Point middle, Color tornado);
     Color** get_canvas() const;
     // Rotates pixels around current center with rotation in radians and draws pixel of current color
     void rotate(double x, double y);
@@ -817,29 +815,7 @@ void Graphics::draw_wave(double height, double width, double period, Point middl
         }
     }
 }
-//Tornados resemble a parametric sine wave
-//Therefore they can be modeled by the equations
-//x=(|t|/a) * sin((t)/10.0 ) and y = (t/10.0) * sin(8-a)/3.0
-//a is a factor affecting shape of the wave, where as "a" approaches 8
-//the shape approaches a line
 
-void Graphics::draw_Tornado(double height, double width, double amplitude, double period, Point middle, Color tornado)
-{
-    current.set(tornado);
-    vector<Point> tenter;
-    for(double i =0.0; i<px;i+=0.02)
-    {
-        Point os=Point(1.00*width*(abs(i)/amplitude) * sin((i)/10.0 +2.00*M_PI*period),1.0*height*(i/10.0) * sin(8.0-amplitude)/3.0);
-        tenter.push_back(os);
-    }
-    for (int i=0;i<tenter.size()-1; i++)
-    {
-
-            draw(tenter[i].x()+middle.x(),tenter[i].y()+middle.y());
-
-    }
-
-}
 Color** Graphics::get_canvas() const
 {
     return canvas;
