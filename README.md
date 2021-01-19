@@ -1,5 +1,9 @@
 C++ Project
 
+Demonstration 1: https://www.youtube.com/watch?v=RNa9RGkrOsE&feature=youtu.be
+
+Demonstration 2: https://www.youtube.com/watch?v=jbBvDUT0DKo&feature=youtu.be
+
 (b)
 The animation consists of a simple weather simulation. The scene is an ocean environment with a boat in the foreground, clouds and rain in the background. 
 The color of the rain, the clouds, the boat, the mast of the boat, the ocean, the sky, and the sun can be manipulated. The dimensions of the boat, the waves, the sun, the clouds, and the rain 
